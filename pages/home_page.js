@@ -19,11 +19,13 @@ module.exports = {
 
   abrir() {
     I.amOnPage('/');
+    I.waitForVisible(this.buttons.entrar, 15);
     I.click(this.buttons.entrar);
-    I.waitForElement(this.buttons.adicionar);
+    I.waitForVisible(this.buttons.adicionar, 15);
   },
 
   adicionarUsuario() {
+    I.waitForClickable(this.buttons.adicionar, 10);
     I.click(this.buttons.adicionar);
     I.waitInUrl('/form');
   },
