@@ -20,13 +20,16 @@ module.exports = {
   abrir() {
     I.amOnPage('/');
     I.waitForVisible(this.buttons.entrar, 15);
-    I.click(this.buttons.entrar);
+    I.retry(3).click(this.buttons.entrar);
     I.waitForVisible(this.buttons.adicionar, 15);
   },
 
+  // A listagem e redesenhada pelo React logo depois de abrir, e o botao pode
+  // ser recriado entre a espera e o clique. O retry do clique cobre isso
+  // (o plugin retryFailedStep nao atua dentro do Before).
   adicionarUsuario() {
     I.waitForClickable(this.buttons.adicionar, 10);
-    I.click(this.buttons.adicionar);
+    I.retry({ retries: 3, minTimeout: 500 }).click(this.buttons.adicionar);
     I.waitInUrl('/form');
   },
 
