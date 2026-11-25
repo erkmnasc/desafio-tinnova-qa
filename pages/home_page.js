@@ -1,40 +1,66 @@
 const { I } = inject();
 
+// Tela inicial e listagem de usuarios.
+// A linha do usuario e localizada pelo e-mail, que e unico em cada teste.
+// Na coluna "Acoes" os icones sao, nesta ordem: consultar, editar e excluir.
+
+const linhaDoUsuario = (email) =>
+  `//div[./div/p[contains(text(), "${email}")]]`;
+
+const acao = (email, posicao) => `${linhaDoUsuario(email)}/div[5]/div[${posicao}]`;
+
 module.exports = {
-
-  fields: {
-    
-  },
-  
-  button: {
-    botaoEntrar: './/*[@id="root"]/div/div[2]',
-    botaoAdicionar: './/*[@id="root"]/div/div[3]',
-    botaoGuardar: './/*[@id="root"]/div/div[6]',
-    botaoEditar: './/*[@id="root"]/div/div[2]/div[2]/div[3]/div[5]/div[2]',
-    //botaoOk: './/html/body/div[2]/div/div[4]/div',
+  buttons: {
+    entrar: { xpath: '//div[normalize-space(text())="Entrar"]' },
+    adicionar: { xpath: '//div[normalize-space(text())="Adicionar"]' },
+    confirmarRemocao: '.swal-button--confirm',
+    cancelarRemocao: '.swal-button--cancel',
   },
 
-  messages: {
-  
+  abrir() {
+    I.amOnPage('/');
+    I.click(this.buttons.entrar);
+    I.waitForElement(this.buttons.adicionar);
   },
 
-  entrarNaPagina(){
-    I.click(this.button.botaoEntrar)
-    I.wait(2);
+  adicionarUsuario() {
+    I.click(this.buttons.adicionar);
+    I.waitInUrl('/form');
   },
-  adicionarNovoUser(){
-    I.click(this.button.botaoAdicionar)
+
+  consultar(email) {
+    I.click({ xpath: acao(email, 1) });
+    I.waitInUrl('/form/view/');
   },
-  guardarUsuario(){
-    I.click(this.button.botaoGuardar)
-    I.wait(2);
+
+  editar(email) {
+    I.click({ xpath: acao(email, 2) });
+    I.waitInUrl('/form/edit/');
   },
-  botaoEditar(){
-    I.click(this.button.botaoEditar)
-    I.wait(2);
+
+  excluir(email) {
+    I.click({ xpath: acao(email, 3) });
+    I.waitForText('Deseja mesmo remover?', 5);
   },
-  botaoOk(){
-    I.click(this.button.botaoOk)
-    I.wait(2);
-  }
-}
+
+  confirmarRemocao() {
+    I.click(this.buttons.confirmarRemocao);
+  },
+
+  cancelarRemocao() {
+    I.click(this.buttons.cancelarRemocao);
+  },
+
+  verUsuarioNaLista(usuario) {
+    I.waitForElement({ xpath: linhaDoUsuario(usuario.email) });
+    within({ xpath: linhaDoUsuario(usuario.email) }, () => {
+      I.see(usuario.nome);
+      I.see(usuario.telefone);
+      I.see(usuario.cpf);
+    });
+  },
+
+  naoVerUsuarioNaLista(email) {
+    I.waitForInvisible({ xpath: linhaDoUsuario(email) }, 5);
+  },
+};

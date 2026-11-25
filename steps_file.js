@@ -1,10 +1,20 @@
-// in this file you can append custom step methods to 'I' object
+const { faker } = require('@faker-js/faker');
+const { generate } = require('gerador-validador-cpf');
 
-module.exports = function() {
-  return actor({
-
-    // Define custom steps here, use 'this' to access default methods of I.
-    // It is recommended to place a general 'login' function here.
-
-  });
+// Gera um usuario novo a cada chamada, com CPF valido e telefone no formato
+// que a aplicacao exibe: (11) 9XXXX-XXXX.
+function novoUsuario() {
+  const celular = faker.string.numeric(8);
+  return {
+    nome: `${faker.person.firstName()} ${faker.person.lastName()}`,
+    email: faker.internet.email({ provider: 'teste.com' }).toLowerCase(),
+    cpf: generate({ format: true }),
+    telefone: `(11) 9${celular.slice(0, 4)}-${celular.slice(4)}`,
+  };
 }
+
+module.exports = function () {
+  return actor({
+    novoUsuario,
+  });
+};
