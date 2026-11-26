@@ -1,4 +1,5 @@
 const { I } = inject();
+const step = require('codeceptjs/steps').default;
 
 // Tela inicial e listagem de usuarios.
 // A linha do usuario e localizada pelo e-mail, que e unico em cada teste.
@@ -20,7 +21,7 @@ module.exports = {
   abrir() {
     I.amOnPage('/');
     I.waitForVisible(this.buttons.entrar, 15);
-    I.retry(3).click(this.buttons.entrar);
+    I.click(this.buttons.entrar, step.retry(3));
     I.waitForVisible(this.buttons.adicionar, 15);
   },
 
@@ -29,7 +30,7 @@ module.exports = {
   // (o plugin retryFailedStep nao atua dentro do Before).
   adicionarUsuario() {
     I.waitForClickable(this.buttons.adicionar, 10);
-    I.retry({ retries: 3, minTimeout: 500 }).click(this.buttons.adicionar);
+    I.click(this.buttons.adicionar, step.retry(3));
     I.waitInUrl('/form');
   },
 

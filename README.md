@@ -33,7 +33,7 @@ styled-components, então os botões são localizados pelo texto.
 
 ## Como rodar
 
-Precisa de Node.js 18 ou mais novo e do Google Chrome. O driver é baixado
+Precisa de Node.js 20 ou mais novo e do Google Chrome. O driver é baixado
 automaticamente pelo WebdriverIO.
 
 ```bash
