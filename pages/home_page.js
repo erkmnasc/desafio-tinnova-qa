@@ -1,5 +1,4 @@
 const { I } = inject();
-const step = require('codeceptjs/steps').default;
 
 // Tela inicial e listagem de usuarios.
 // A linha do usuario e localizada pelo e-mail, que e unico em cada teste.
@@ -10,27 +9,36 @@ const linhaDoUsuario = (email) =>
 
 const acao = (email, posicao) => `${linhaDoUsuario(email)}/div[5]/div[${posicao}]`;
 
+const botao = (texto) => ({ xpath: `//div[normalize-space(text())="${texto}"]` });
+
+// A tela inicial e redesenhada pelo React logo depois de carregar, e os botoes
+// Entrar e Adicionar podem ser recriados entre a espera e o clique (no CI isso
+// acontecia com frequencia). Por isso o clique desses dois e feito dentro do
+// navegador, localizando o botao no mesmo instante em que clica.
+function clicarBotao(texto) {
+  I.waitForVisible(botao(texto), 15);
+  I.executeScript((t) => {
+    const alvo = [...document.querySelectorAll('#root div')]
+      .find((el) => el.children.length === 0 && el.textContent.trim() === t);
+    alvo.click();
+  }, texto);
+}
+
 module.exports = {
   buttons: {
-    entrar: { xpath: '//div[normalize-space(text())="Entrar"]' },
-    adicionar: { xpath: '//div[normalize-space(text())="Adicionar"]' },
+    adicionar: botao('Adicionar'),
     confirmarRemocao: '.swal-button--confirm',
     cancelarRemocao: '.swal-button--cancel',
   },
 
   abrir() {
     I.amOnPage('/');
-    I.waitForVisible(this.buttons.entrar, 15);
-    I.click(this.buttons.entrar, step.retry(3));
+    clicarBotao('Entrar');
     I.waitForVisible(this.buttons.adicionar, 15);
   },
 
-  // A listagem e redesenhada pelo React logo depois de abrir, e o botao pode
-  // ser recriado entre a espera e o clique. O retry do clique cobre isso
-  // (o plugin retryFailedStep nao atua dentro do Before).
   adicionarUsuario() {
-    I.waitForClickable(this.buttons.adicionar, 10);
-    I.click(this.buttons.adicionar, step.retry(3));
+    clicarBotao('Adicionar');
     I.waitInUrl('/form');
   },
 
